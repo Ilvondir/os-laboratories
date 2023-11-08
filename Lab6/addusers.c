@@ -27,23 +27,20 @@ int main(int argc, char *argv[]) {
 
     while (fgets(line, sizeof(line), fp) != NULL) {
         
-        char login[32+1];
+        char login[32+1] = "";
         char fullName[50+1];
         char password[8+1];
         
         char* token = strtok(line, ";");
         
-        strncpy(login, token, 1);
-        login[1] = '\0';
+        strncat(login, token, 1);
         
         strcpy(fullName, token);
         strcat(fullName, " ");
         
         token = strtok(NULL, ";");
         
-        strcat(login, token);
-        
-        if (strlen(login) > 32) login[32] = '\0';
+        strncat(login, token, 31);;
         
         strcat(fullName, token);
         
@@ -61,9 +58,7 @@ int main(int argc, char *argv[]) {
         } else 
             token[n-1] = '\0';
         
-        if (strlen(token) > 8) token[8] = '\0';
-        
-        strcpy(password, token);
+        strncpy(password, token, 8);
     
         char* encrypted = crypt_r(password, "cd", &data);
         
