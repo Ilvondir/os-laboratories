@@ -17,7 +17,6 @@ section .text
 main:
 
     push rbp
-    mov  rbp, rsp
 
     mov rdi, str0       ; str0 moved to rdi as format
     call printf
