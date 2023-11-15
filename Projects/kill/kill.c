@@ -53,3 +53,8 @@ int main(int argc, char *argv[]) {
 	
 	return 0;
 }
+
+/*
+	Michal Komsa
+		gcc -m64 -o kill kill.c
+*/
