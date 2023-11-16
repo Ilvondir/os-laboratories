@@ -1,59 +1,65 @@
-    [bits 64]
+          [bits 64]
 
 section .data
-str0    db "Enter process id: ", 0
-str1    db "%d", 0
-str2    db "Success! Process killed!", 0xA, 0
-str3    db "Error! There is no process with this id or you dont have permissions to kill it.", 0xA, 0
+str0      db "Enter process id: ", 0
+str1      db "%d", 0
+str2      db "Success! Process killed!", 0xA, 0
+str3      db "Error! There is no process with this id or you dont have permissions to kill it.", 0xA, 0
 
 section .bss
-    pid resq 1
+pid       resq 1
 
 section .text
-    extern printf
-    extern scanf
-    global main
+          extern printf
+          extern scanf
+          global main
 
 main:
 
-    push rbp
+;         rsp -> [ret]  ; ret - adres powrotu do asmloader
 
-    mov rdi, str0       ; str0 moved to rdi as format
-    call printf
-    
-    mov  rdi, str1      ; str1 moved to rdi as format
-    mov  rsi, pid       ; adrress pid moved to rsi
-    call scanf
-    
-    pop rbp
+          push rbp
+;         rsp -> [rbp][ret]
 
-    mov rdi, [pid]      ; process id to killed
-    mov rsi, 9          ; signal (9: kill)
-    mov rax, 62         ; syscall number for kill
-    syscall
+          mov rdi, str0  ; str0 moved to rdi as format
+          call printf  ; printf("Enter process id: ");
 
-    cmp rax, 0          ; compare rax with 0
+          mov  rdi, str1  ; rdi = &str1
+          mov  rsi, pid  ; rsi = &pid
+          call scanf  ; scanf("%d", &pid);
+          
+          pop rbp  ; rbp = rbp
+;         rsp -> [ret]
+      
+          mov rdi, [pid] ; rdi = pid
+          mov rsi, 9  ; rsi = 9 (9: SIGKILL)
+          mov rax, 62  ; rax = 62 (62: kill)
+          syscall  ; kill(pid, 9);
 
-    push rbp
-
-    je success
+          cmp rax, 0  ; rax - 0               ; OF SF ZF AF PF CF affected
+      
+          push rbp
+;         rsp -> [rbp][ret]
+      
+          je success  ; jump if equal ; jump if rax == 0               ; jump if ZF = 1
 
 failure:
-    mov rdi, str3       ; str3 moved to rdi as format
-    call printf
+          mov rdi, str3  ; rdi = &str3
+          call printf  ; printf("Error! There is no process with this id or you dont have permissions to kill it.\n");
 
-    jmp exit
+          jmp exit  ; jump
 
 success:    
-    mov rdi, str2       ; str2 moved to rdi as format
-    call printf
+          mov rdi, str2  ; rdi = &str3
+          call printf  ; printf("Success! Process killed!\n");
 
 exit:
-    pop rbp
+          pop rbp  ; rbp = rbp
+;         rsp -> [ret]
 
-    mov rax, 60         ; syscall number for exit
-    mov rdi, 0          ; returned status
-    syscall
+          mov rax, 60  ; rax = 60
+          mov rdi, 0  ; rdi = 0
+          syscall  ; exit(0)
 
 ; Michal Komsa
 ;   nasm -felf64 kill.asm
