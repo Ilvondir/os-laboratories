@@ -1,26 +1,33 @@
-    [bits 32]
+          [bits 32]
 
 section .data
-wynik   db "Watek numer %d", 0xA, 0
+wynik      db "Watek numer %d", 0xA, 0
 
 section .text
-    global main
-    extern printf
-    extern exit
- 
+          global main
+          extern printf
+          extern exit
+
 main:
-    
-    mov eax, 224 ; 224 to numer wywolania gettid
-    int 0x80 ; syscall
+;         esp -> [ret]  ; ret - adres powrotu do asmloader
 
-    push eax
+          mov eax, 224 ; eax = 224 (numer wywolania gettid)
+          int 0x80 ; syscall
 
-    push wynik
-    call printf
-    add esp, 2*4
+;         esp -> [ret]
 
-    push 0
-    call exit
+          push eax
+;         esp -> [eax][ret]
+
+          push wynik
+;         esp -> [wynik][eax][ret]
+
+          call printf  ; printf("Watek numer %d\n", eax);
+          add esp, 2*4
+;         esp -> [ret]
+
+          push 0
+          call exit  ; exit(0)
 
 
 ; Kompilacja:
