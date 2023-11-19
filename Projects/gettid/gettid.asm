@@ -23,7 +23,7 @@ main:
 ;         esp -> [wynik][eax][ret]
 
           call printf  ; printf("Watek numer %d\n", eax);
-          add esp, 2*4
+          add esp, 2*4  ; esp = esp + 8
 ;         esp -> [ret]
 
           push 0
